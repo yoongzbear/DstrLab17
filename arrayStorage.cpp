@@ -4,7 +4,7 @@
 #include <iostream>
 
 // set initial capacity
-const int INITIAL_CAPACITY = 100;
+const int INITIAL_CAPACITY = 2000000;
 
 // initialize array constructor
 ArrayStorage::ArrayStorage()

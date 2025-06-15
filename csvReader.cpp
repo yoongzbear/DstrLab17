@@ -56,6 +56,8 @@ Transaction parseTransaction(const std::string &line)
 
 int main()
 {
+    std::cout << "Reading financial fraud detection dataset...\n"
+              << std::endl;
     std::string filename{"financial_fraud_detection_dataset.csv"}; // csv file
     std::ifstream input{filename};
 
@@ -66,27 +68,53 @@ int main()
         return 1;
     }
 
+    std::cout << "Opening file: " << filename << "\n"
+              << std::endl; // can
+
     ArrayStorage arrayStorage;
 
     std::string line;
     std::getline(input, line); // skip header
 
     Transaction transaction[test_size];
+    int limit = 1000;
     int count = 0;
 
-    while (std::getline(input, line)) {
-        Transaction t = parseTransaction(line);
-        arrayStorage.addTransaction(t);
+    std::cout << "Loading " << limit << " rows...\n"; // can
 
-        if (++count % 100000 == 0) {
-            std::cout << count << " rows loaded...\n";
+    while (std::getline(input, line) && count < limit)
+    {
+        std::cout << "Read line " << count + 1 << ": " << line << "\n"; // NEW LINE
+        // stops at line 355
+        try
+        {
+            Transaction t = parseTransaction(line);
+            arrayStorage.addTransaction(t);
+            count++;
+            if (count % 100000 == 0)
+            {
+                std::cout << count << " rows loaded...\n";
+            }
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "Error parsing line " << count + 1 << ": " << e.what() << "\n";
+            std::cerr << "Line content: " << line << "\n";
         }
     }
+
+    if (arrayStorage.getSize() == 0)
+    {
+        std::cout << "No transactions were loaded. Please check the CSV content.\n";
+    }
+
+    std::cout << "Finished loading " << count << " rows.\n"; // error is here
 
     std::cout << "Total transactions stored: " << arrayStorage.getSize() << "\n";
 
     // print out result to see if it works
-    for (int i = 0; i < std::min(10, arrayStorage.getSize()); ++i) {
+    for (int i = 0; i < std::min(10, arrayStorage.getSize()); ++i)
+    {
         arrayStorage.getTransaction(i).print();
     }
 }
