@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <vector>
 #include "arrayStorage.hpp"
+#include <algorithm>
 
 const int test_size = 10; // for testing to see if array works
 
@@ -14,38 +15,88 @@ const int test_size = 10; // for testing to see if array works
 Transaction parseTransaction(const std::string &line)
 {
     std::stringstream stream(line);
-    std::string item; // temporary placeholder for each item in a row
+    std::string item;
     Transaction t;
 
     std::getline(stream, t.transaction_id, ',');
     std::getline(stream, t.timestamp, ',');
     std::getline(stream, t.sender_account, ',');
     std::getline(stream, t.receiver_account, ',');
-    // double
-    std::getline(stream, item, ',');
-    t.amount = std::stod(item);
+
+    if (std::getline(stream, item, ',') && !item.empty())
+    {
+        try
+        {
+            t.amount = std::stod(item);
+        }
+        catch (...)
+        {
+            t.amount = 0.0;
+        }
+    }
+    else
+    {
+        t.amount = 0.0;
+    }
 
     std::getline(stream, t.transaction_type, ',');
     std::getline(stream, t.merchant_category, ',');
     std::getline(stream, t.location, ',');
     std::getline(stream, t.device_used, ',');
-    // boolean
+
     std::getline(stream, item, ',');
     t.is_fraud = (item == "TRUE");
 
     std::getline(stream, t.fraud_type, ',');
     std::getline(stream, t.time_since_last_transaction, ',');
-    // double
-    std::getline(stream, item, ',');
-    t.spending_deviation_score = std::stod(item);
 
-    // int
-    std::getline(stream, item, ',');
-    t.velocity_score = std::stoi(item);
+    if (std::getline(stream, item, ',') && !item.empty())
+    {
+        try
+        {
+            t.spending_deviation_score = std::stod(item);
+        }
+        catch (...)
+        {
+            t.spending_deviation_score = 0.0;
+        }
+    }
+    else
+    {
+        t.spending_deviation_score = 0.0;
+    }
 
-    // double
-    std::getline(stream, item, ',');
-    t.geo_anomaly_score = std::stod(item);
+    if (std::getline(stream, item, ',') && !item.empty())
+    {
+        try
+        {
+            t.velocity_score = std::stoi(item);
+        }
+        catch (...)
+        {
+            t.velocity_score = 0;
+        }
+    }
+    else
+    {
+        t.velocity_score = 0;
+    }
+
+    if (std::getline(stream, item, ',') && !item.empty())
+    {
+        try
+        {
+            t.geo_anomaly_score = std::stod(item);
+        }
+        catch (...)
+        {
+            t.geo_anomaly_score = 0.0;
+        }
+    }
+    else
+    {
+        t.geo_anomaly_score = 0.0;
+    }
 
     std::getline(stream, t.payment_channel, ',');
     std::getline(stream, t.ip_address, ',');
@@ -56,8 +107,6 @@ Transaction parseTransaction(const std::string &line)
 
 int main()
 {
-    std::cout << "Reading financial fraud detection dataset...\n"
-              << std::endl;
     std::string filename{"financial_fraud_detection_dataset.csv"}; // csv file
     std::ifstream input{filename};
 
@@ -68,39 +117,21 @@ int main()
         return 1;
     }
 
-    std::cout << "Opening file: " << filename << "\n"
-              << std::endl; // can
-
-    ArrayStorage arrayStorage;
+    ArrayStorage arrayStorage(1000000);
 
     std::string line;
+    int lineNum = 1;           // since header is line 1
     std::getline(input, line); // skip header
 
     Transaction transaction[test_size];
     int limit = 1000;
     int count = 0;
 
-    std::cout << "Loading " << limit << " rows...\n"; // can
-
     while (std::getline(input, line) && count < limit)
     {
-        std::cout << "Read line " << count + 1 << ": " << line << "\n"; // NEW LINE
-        // stops at line 355
-        try
-        {
-            Transaction t = parseTransaction(line);
-            arrayStorage.addTransaction(t);
-            count++;
-            if (count % 100000 == 0)
-            {
-                std::cout << count << " rows loaded...\n";
-            }
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "Error parsing line " << count + 1 << ": " << e.what() << "\n";
-            std::cerr << "Line content: " << line << "\n";
-        }
+        Transaction t = parseTransaction(line);
+        arrayStorage.addTransaction(t);
+        // can add error handling
     }
 
     if (arrayStorage.getSize() == 0)

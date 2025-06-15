@@ -14,9 +14,9 @@ class ArrayStorage {
         void  resize(); // resizing capacity
 
     public: 
-        ArrayStorage(); // constructor
+        ArrayStorage(int initialCapacity); // constructor
         ~ArrayStorage(); // destructor
-        void addTransaction(Transaction transaction); // add row to array
+        void addTransaction(const Transaction& t); // add row to array
         int getSize(); // get size of array
         Transaction getTransaction(int index);
 };

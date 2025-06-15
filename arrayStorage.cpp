@@ -4,27 +4,27 @@
 #include <iostream>
 
 // set initial capacity
-const int INITIAL_CAPACITY = 2000000;
+const int INITIAL_CAPACITY = 1000000;
 
 // initialize array constructor
-ArrayStorage::ArrayStorage()
+ArrayStorage::ArrayStorage(int initialCapacity)
 {
-    this->transaction_data = new Transaction[this->capacity];
-    this->capacity = INITIAL_CAPACITY;
-    this->size = 0;
+    transaction_data = new Transaction[INITIAL_CAPACITY];
+        capacity = initialCapacity;
+        size = 0;
 }
 
 // array destuctor
 ArrayStorage::~ArrayStorage()
 {
-    delete[] this->transaction_data;
+    delete[] transaction_data;
 }
 
 void ArrayStorage::resize()
 {
     // double the capacity once array reaches its limit
     int newCapacity = capacity * 2;
-    Transaction *newData = new Transaction[newCapacity];
+        Transaction* newData = new Transaction[newCapacity];
 
     for (int i = 0; i < size; ++i)
     {
@@ -37,12 +37,12 @@ void ArrayStorage::resize()
 }
 
 // add row into array
-void ArrayStorage::addTransaction(Transaction transaction) {
+void ArrayStorage::addTransaction(const Transaction& t) {
     if (size == capacity)
     {
         resize();
     }
-    transaction_data[size++] = transaction; // add the row into array
+    transaction_data[size++] = t; // add the row into array
 }
 
 // get size
