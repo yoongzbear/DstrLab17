@@ -3,9 +3,18 @@
 #ifndef CSVREADER_H
 #define CSVREADER_H
 
-#define TRANSACTION_HPP
-
 #include <string>
 #include "arrayStorage.hpp"
+#include "transaction.hpp"
+
+Transaction parseTransaction(const std::string &line);
+
+void readCsvArray(const std::string &filename,
+                  ArrayStorage &arrayStorage,
+                  ArrayStorage &cardArray,
+                  ArrayStorage &achArray,
+                  ArrayStorage &wireArray,
+                  ArrayStorage &upiArray,
+                  ArrayStorage &otherArray);
 
 #endif

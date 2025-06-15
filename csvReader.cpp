@@ -1,5 +1,4 @@
 // read the csv file
-// https://cppbyexample.com/parse_csv.html - use vector, cannot dy
 
 #include <fstream>
 #include <sstream>
@@ -9,9 +8,7 @@
 #include "arrayStorage.hpp"
 #include <algorithm>
 
-const int test_size = 10; // for testing to see if array works
-
-// parse transaction csv to be more neat
+// parse transaction csv to be more neat 
 Transaction parseTransaction(const std::string &line)
 {
     std::stringstream stream(line);
@@ -29,7 +26,7 @@ Transaction parseTransaction(const std::string &line)
         {
             t.amount = std::stod(item);
         }
-        catch (...)
+        catch (...) // add something
         {
             t.amount = 0.0;
         }
@@ -56,7 +53,7 @@ Transaction parseTransaction(const std::string &line)
         {
             t.spending_deviation_score = std::stod(item);
         }
-        catch (...)
+        catch (...) // add something here
         {
             t.spending_deviation_score = 0.0;
         }
@@ -105,47 +102,54 @@ Transaction parseTransaction(const std::string &line)
     return t;
 }
 
-int main()
+void readCsvArray(const std::string &filename,
+                  ArrayStorage &arrayStorage,
+                  ArrayStorage &cardArray,
+                  ArrayStorage &achArray,
+                  ArrayStorage &wireArray,
+                  ArrayStorage &upiArray,
+                  ArrayStorage &otherArray)
 {
-    std::string filename{"financial_fraud_detection_dataset.csv"}; // csv file
     std::ifstream input{filename};
 
     // cannot read file
     if (!input.is_open())
     {
         std::cerr << "Couldn't read file: " << filename << "\n";
-        return 1;
+        return;
     }
-
-    ArrayStorage arrayStorage(1000000);
 
     std::string line;
-    int lineNum = 1;           // since header is line 1
     std::getline(input, line); // skip header
 
-    Transaction transaction[test_size];
-    int limit = 1000;
-    int count = 0;
-
-    while (std::getline(input, line) && count < limit)
+    // add into array and linked list
+    while (std::getline(input, line))
     {
-        Transaction t = parseTransaction(line);
-        arrayStorage.addTransaction(t);
+        Transaction t = parseTransaction(line); // parse row
+        arrayStorage.addTransaction(t); // add into overall array storage
         // can add error handling
+
+        // separate arrays
+        if (t.payment_channel == "card")
+        {
+            cardArray.addTransaction(t);
+        }
+        else if (t.payment_channel == "ACH")
+        {
+            achArray.addTransaction(t);
+        }
+        else if (t.payment_channel == "wire_transfer")
+        {
+            wireArray.addTransaction(t);
+        }
+        else if (t.payment_channel == "UPI")
+        {
+            upiArray.addTransaction(t);
+        }
+        else
+        {
+            otherArray.addTransaction(t); // unidentified channel
+        }
     }
 
-    if (arrayStorage.getSize() == 0)
-    {
-        std::cout << "No transactions were loaded. Please check the CSV content.\n";
-    }
-
-    std::cout << "Finished loading " << count << " rows.\n"; // error is here
-
-    std::cout << "Total transactions stored: " << arrayStorage.getSize() << "\n";
-
-    // print out result to see if it works
-    for (int i = 0; i < std::min(10, arrayStorage.getSize()); ++i)
-    {
-        arrayStorage.getTransaction(i).print();
-    }
 }

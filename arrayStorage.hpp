@@ -7,7 +7,7 @@
 
 class ArrayStorage { 
     private:
-        Transaction* transaction_data; 
+        Transaction* transaction_data; // pointer to transaction data
         int capacity; // for memory capacity
         int size;
 
@@ -15,6 +15,7 @@ class ArrayStorage {
 
     public: 
         ArrayStorage(int initialCapacity); // constructor
+        ArrayStorage(); // constructor without initialcapacity defined
         ~ArrayStorage(); // destructor
         void addTransaction(const Transaction& t); // add row to array
         int getSize(); // get size of array

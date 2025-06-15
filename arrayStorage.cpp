@@ -4,13 +4,20 @@
 #include <iostream>
 
 // set initial capacity
-const int INITIAL_CAPACITY = 1000000;
+const int INITIAL_CAPACITY = 100;
 
 // initialize array constructor
 ArrayStorage::ArrayStorage(int initialCapacity)
 {
-    transaction_data = new Transaction[INITIAL_CAPACITY];
+    transaction_data = new Transaction[initialCapacity];
         capacity = initialCapacity;
+        size = 0;
+}
+
+ArrayStorage::ArrayStorage()
+{
+    transaction_data = new Transaction[INITIAL_CAPACITY];
+        capacity = INITIAL_CAPACITY;
         size = 0;
 }
 

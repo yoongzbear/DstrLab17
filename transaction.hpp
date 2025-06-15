@@ -7,7 +7,6 @@
 #include <iostream>
 
 // struct
-
 struct Transaction
 {
     std::string transaction_id;
